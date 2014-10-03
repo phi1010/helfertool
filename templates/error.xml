@@ -1,0 +1,15 @@
+{% extends 'base.xml' %}
+
+{% block content %}
+<h1>Fehler: {{error_short}}</h1>
+<div id="generic_error_text">
+	Es ist ein Fehler aufgetreten. Melde dich bitte per Mail bei
+	{{config.admin_email}} wenn du eine Frage dazu hast.
+</div>
+
+<h4>Fehlerbeschreibung</h4>
+<div id="specific_error_text">
+	{{error_long}}
+</div>
+
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'base.xml' %}
+
+{% block content %}
+<h1>Fragenübersicht</h1>
+
+
+<p>Insgesamt liegen {{unanswered | length }} unbeantwortete Fragen vor. Kannst du vielleicht helfen?<br/>
+{% for u in unanswered %}
+	<b class="indent"><a href="/questions/{{u.tid}}#q{{u.qid}}">{{u.qtitle}}</a></b><br/>
+{% endfor %}
+</p>
+
+<p>Es sind im Moment {{questions | length }} Fragen im System:<br />
+{% for f in questions %}
+	<b class="indent"><a href="/questions/{{f.tid}}">{{f.ttitle}}</a></b> ({{f.qcount}} Fragen und {{f.acount}} Antworten in diesem Thread)<br/>
+{% endfor %}
+</p>
+
+
+
+{% endblock %}

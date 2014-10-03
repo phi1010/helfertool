@@ -1,0 +1,25 @@
+{% extends 'base.xml' %}
+
+{% block content %}
+<h1>Nachrichten</h1>
+
+Du hast {{messageCount}} Nachrichten.
+<table>
+
+{% if (messages | length ) > 0 %}
+<tr>
+	<th>Betreff</th><th>Von</th>
+</tr>
+{%endif%}
+
+{% for m in messages %}
+	<tr onclick="toggleMessageAndMarkRead({{m.id}});" style="cursor:pointer"><td id="messageTitle{{m.id}}" {% if m.read == 0 %} style="font-weight:bold" {%endif%}>{{m.title}}</td>
+	<td>{%if m.senderid != None %}
+		{{m.sendername}}
+		{%else%}
+		Systemnachricht
+	{%endif%}</td></tr>
+	<tr id="messageContent{{m.id}}" style="display:none"><td colspan="9999">{{m.content}}</td></tr>
+{% endfor %}
+</table>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'base.xml' %}
+{% block content %}
+	<h1>Station anlegen</h1>
+	<!-- station eintragen -->
+	<form method="POST" action="/station/new" enctype="multipart/form-data">
+		<table>
+			<tr>
+				<td>Name</td>
+				<td><input type="text" name="name" width="80" data-dataType="stringNotEmpty"/></td>
+			</tr>
+			<tr>
+				<td>Beschreibung</td>
+				<td><textarea name="beschreibung" cols="42" rows="5"/></td>
+			</tr>
+			<tr>
+				<td colspan="2"><input type="submit" value=" Übernehmen " /></td>
+			</tr>
+		</table>
+	</form>
+
+{% endblock %}

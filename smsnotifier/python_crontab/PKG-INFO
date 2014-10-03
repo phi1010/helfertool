@@ -1,0 +1,200 @@
+Metadata-Version: 1.1
+Name: python-crontab
+Version: 1.4.3
+Summary: Python Crontab API
+Home-page: https://launchpad.net/python-crontab
+Author: Martin Owens
+Author-email: doctormo@gmail.com
+License: GPLv3
+Description: Bug Reports
+        ===========
+        
+        Please report any problems to the launchpad bug tracker: https://bugs.launchpad.net/python-crontab
+        
+        Description
+        ===========
+        
+        Crontab module for read and writing crontab files and accessing the system cron
+        automatically and simply using a direct API.
+        
+        Comparing the below chart to http://en.wikipedia.org/wiki/Cron#CRON_expression
+        you will note that W, L, # and ? symbols are not supported.
+        
+        ============= =========== ================= ===========================
+        Field Name    Mandatory   Allowed Values    Allowed Special Characters
+        ============= =========== ================= ===========================
+        Minutes       Yes         0-59              \* / , -
+        Hours         Yes         0-23              \* / , -
+        Day of month  Yes         1-31              \* / , -
+        Month         Yes         1-12 or JAN-DEC   \* / , -
+        Day of week   Yes         0-6 or SUN-SAT    \* / , -
+        ============= =========== ================= ===========================
+        
+        Supported special cases allow crontab lines to not use fields. These are the supported aliases:
+        
+        =========== ===========
+        Case        Meaning
+        =========== ===========
+        @reboot     Every boot
+        @hourly     0 * * * *
+        @daily      0 0 * * *
+        @weekly     0 0 * * 0
+        @monthly    0 0 1 * *
+        @yearly     0 0 1 1 *
+        @annually   0 0 1 1 *
+        @midnight   0 0 * * *
+        =========== ===========
+        
+        How to Use the Module
+        =====================
+        
+        Getting access to a crontab can happen in four ways::
+        
+            from crontab import CronTab
+        
+            system_cron = CronTab()
+            user_cron = CronTab('root')
+            file_cron = CronTab(tabfile='filename.tab')
+            mem_cron = CronTab(tab="""
+              * * * * * command
+            """)
+        
+        Creating a new job is as simple as::
+        
+            job  = cron.new(command='/usr/bin/echo')
+        
+        And setting the job's time restrictions::
+        
+            job.minute.during(5,50).every(5)
+            job.hour.every(4)
+            job.day.on(4, 5, 6)
+        
+            job.dow.on('SUN')
+            job.month.during('APR', 'NOV')
+        
+        Creating a job with a comment::
+        
+            job = cron.new(command='/foo/bar',comment='SomeID')
+        
+        Disabled or Enable Job::
+        
+            job.enable()
+            job.enable(False)
+            False == job.is_enabled()
+        
+        Validity Check::
+        
+            True == job.is_valid()
+        
+        Use a special syntax::
+        
+            job.every_reboot()
+        
+        Find an existing job by command::
+        
+            list = cron.find_command('bar')
+        
+        Find an existing job by comment::
+        
+            list = cron.find_comment('ID or some text')
+        
+        Set and get the comment for a job::
+        
+            comment = job.meta(['New Comment for job'])
+        
+        Clean a job of all rules::
+        
+            job.clear()
+        
+        Iterate through all jobs::
+        
+            for job in cron:
+                print job
+        
+        Iterate through all lines::
+        
+            for line in cron.lines:
+                print line
+        
+        Remove Items::
+        
+            cron.remove( job )
+            cron.remove_all('echo')
+        
+        Write CronTab back to system or filename::
+        
+            cron.write()
+        
+        Write CronTab to new filename::
+        
+            cron.write( 'output.tab' )
+        
+        Log Functionality
+        =================
+        
+        The log functionality will read a cron log backwards to find you the last run
+        instances of your crontab and cron jobs.
+        
+        The crontab will limit the returned entries to the user the crontab is for.
+        
+            cron = CronTab(user='root')
+        
+            for d in cron.log:
+                print d['pid'] + " - " + d['date']
+        
+        Each job can return a log iterator too, these are filtered so you can see when
+        the last execution was.
+        
+            for d in cron.find_command('echo')[0].log:
+                print d['pid'] + " - " + d['date']
+        
+        Schedule Functionality
+        ======================
+        
+        If you have the croniter python module installed, you will have access to a
+        schedule on each job. For example if you want to know when a job will next run:
+        
+            schedule = job.schedule(date_from=datetime.now())
+        
+        This creates a schedule croniter based on the job from the time specified. The
+        default date_from is the current date/time if not specified. Next we can get
+        the datetime of the next job:
+        
+            datetime = schedule.get_next()
+        
+        Or the previous:
+        
+            datetime = schedule.get_prev()
+        
+        The get methods work in the same way as the default croniter, except that they
+        will return datetime objects by default instead of floats. If you want the
+        original functionality, pass float into the method when calling:
+        
+            datetime = schedule.get_current(float)
+        
+        If you don't have the croniter module installed, you'll get an ImportError when
+        you first try using the schedule function on your cron job object.
+        
+        Extra Support
+        =============
+        
+         - Support for SunOS with compatibility mode
+         - Python 3.2 and Python 2.7 tested
+         - Windows support works for manual crontabs only
+        
+Platform: linux
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Development Status :: 6 - Mature
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Information Technology
+Classifier: Intended Audience :: System Administrators
+Classifier: License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)
+Classifier: Operating System :: POSIX
+Classifier: Operating System :: POSIX :: Linux
+Classifier: Operating System :: POSIX :: SunOS/Solaris
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2.6
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3.2
+Provides: crontab
+Provides: cronlog

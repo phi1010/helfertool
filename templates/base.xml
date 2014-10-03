@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de" lang="de">
+	<head>
+		<title>{{config.pagetitle}}</title>
+		{% block css %}
+		<link type="text/css" href="{{ url_for('static', file='style.css') }}" rel="stylesheet" />
+		<link type="text/css" href="{{ url_for('static', file='jquery-ui-1.10.3.custom.min.css') }}" rel="stylesheet" />
+		{% endblock %}
+		{% block js %}
+		<script type="text/javascript" src="{{ url_for('static', file='jquery-1.10.2.min.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', file='jquery-ui-1.10.3.custom.min.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', file='local.js') }}"></script>
+		{% endblock %}
+		{% block javascript %}{% endblock %}
+		{% block meta %}
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		{% endblock %}
+	</head>
+	<body>
+
+		{% import "menu.xml" as menu %}
+		{{ menu.displayMenu(session) }}
+
+		{%if session.messages%}
+		<div class="viewBlocker" id="messageViewBlocker" onclick="removeFirstMessage();">&nbsp;</div>
+		<div class="messages">
+				{%for message in session.messages%}
+					{%if message.type == "error"%}
+						<div class="message errorMessage">
+							<span class="errorHeader">Fehler</span><br/>
+					{%else%}
+						<div class="message notificationMessage">
+							<span class="notificationHeader">Hinweis</span><br/>
+					{%endif%}
+				{{message.text}}<br/>
+				<button onclick="removeMessage(this);">OK</button>
+				</div>
+				{%endfor%}
+				{% if messages_displayed(session) %}{%endif%} {#do not display output of message_displayed#}
+		</div>
+		{%endif%}
+
+		<div id="main">
+			<div class="headline">
+			{% block headline %}
+			{% endblock %}
+			</div>
+			{% block content %}
+			{% endblock %}
+		</div>
+		<br />
+
+		<div id="footer">
+			{% block footer %}
+			{% endblock %}
+		</div>
+	</body>
+</html>
+

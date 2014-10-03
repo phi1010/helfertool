@@ -1,0 +1,23 @@
+{% extends 'base.xml' %}
+
+{% block headline %}
+{% endblock %}
+
+{% block content %}
+<h1>Helferübersicht</h1>
+{% for h, ss in schichten.iteritems() %}
+<ul class="nobullet">
+	<table frame="lhs">
+		<li>
+			{{h}}
+			<ul class="nobullet">
+				{% for s in ss %}
+				<li>{{s.0|e}}</li>
+				{% endfor %}
+			</ul>
+		</li>
+	</table>
+</ul>
+{% endfor %}
+
+{% endblock %}

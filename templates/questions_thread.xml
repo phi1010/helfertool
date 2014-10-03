@@ -1,0 +1,70 @@
+{% extends 'base.xml' %}
+
+{% block content %}
+<h1>Frage: {{title|e}}</h1>
+
+{% for f in frage %}
+	{% if lastqid != f.qid %}
+		{% if not loop.first and lastatext!=None%}
+				<div class="answerfieldcontainer">
+					<small>Antworten nicht zufriedenstellend? <a href="#" onclick="javascript:$('#precise{{test}}').toggle();">Ergänze eine weitere Antwort.</a></small><br/>
+					<span style="display:none;" id="precise{{test}}">
+					<form method="POST" action="/questions/answer/{{lastqid}}">
+						<textarea name="text" cols="42" rows="5" data-dataType="stringNotEmpty"></textarea>
+						<button type="submit">Antwort eintragen</button>
+					</form>
+					</span>
+				</div><!--answerfieldcontainer inner.notfirst-->
+			</div><!--answerscontainer inner.notfirst-->
+		</div><!--questionsanswerscontainer inner.notfirst-->
+		{% endif %}
+		
+		<div class="questionanswerscontainer">
+			<div class="questioncontainer">
+				<span class="questiontitle" id="q{{f.qid}}">{{f.qtitle|e}}</span><br/>
+				{{f.qtext|e}}
+			</div>
+			<div class="answerscontainer">
+	{% endif %}
+	{% if f.atext == None %}
+				<div class="answerfieldcontainer">
+					Noch keine Antwort eingetragen. Frage beantworten?
+					<form method="POST" action="/questions/answer/{{f.qid}}">
+						<textarea name="text" cols="42" rows="5" data-dataType="stringNotEmpty"/>
+						<button type="submit">Antwort eintragen</button>
+					</form>
+				</div><!--answerfieldcontainer inner-->
+			</div><!--answerscontainer inner-->
+		</div><!--questionsanswerscontainer inner.notfirst-->
+	{% else %}
+				<div class="answercontainer">
+					<b>Antwort:</b> {{f.atext|e}}<br />
+				</div>
+	{% endif %}
+
+	{% set lastqid = f.qid %}
+	{% set lastatext = f.atext %}
+	{% if loop.last and f.atext!= None %}
+
+				<div class="answerfieldcontainer">
+					<small>Antworten nicht zufriedenstellend? <a href="#" onclick="javascript:$('#precise{{f.qid}}').toggle();">Ergänze eine weitere Antwort.</a></small><br/>
+					<span style="display:none;" id="precise{{f.qid}}">
+					<form method="POST" action="/questions/answer/{{f.qid}}">
+						<textarea name="text" cols="42" rows="5" data-dataType="stringNotEmpty"></textarea>
+						<button type="submit">Antwort eintragen</button>
+					</form>
+					</span>
+				</div><!--answerfieldcontainer outer-->
+			</div><!--answerscontainer outer-->
+		</div><!--questionsanswerscontainer outer-->
+	{% endif %}
+{% endfor %}
+<small>Fragen oder Antworten nicht zufriedenstellend? <a href="#" onclick="$('#followup').toggle();">Stelle eine Follow-up Frage</a></small>
+<form method="POST" action="/questions/ask" id="followup" style="display:none">
+	<input type="hidden" name="thread_id" value="{{tid}}" /><br/>
+	Titel:<input type="text" name="title" data-dataType="stringNotEmpty"/><br/>
+	Text:<textarea name="text" cols="42" rows="5" data-dataType="stringNotEmpty"></textarea><br/>
+	<button type="submit">Follow-up Frage stellen</button>
+</form>
+
+{% endblock %}

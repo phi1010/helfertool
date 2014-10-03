@@ -1,0 +1,28 @@
+{% block loginbox %}
+	{% if is_user_logged_in(session) %}
+	<span id="loginInfo">✓ eingeloggt als {{session.username}}</span>
+	<span class="textButton"><a href="/logout">Logout</a></span>
+	{% else %}
+	<table>
+		<form method="POST" action="/login">
+			<input type="hidden" name="redirect_target" value="{{redirect_target}}"/>
+			<tr>
+				<td>Username</td>
+				<td><input type="text" name="username" style="width:80px;" data-dataType="stringNotEmpty"/></td>
+			</tr>
+			<tr>
+				<td>Passwort</td>
+				<td><input type="password" name="password" style="width:80px;" data-dataType="stringNotEmpty"/></td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<input type="submit" value="go" />
+				</td>
+			</tr>
+		</form>
+		<!-- <div class="textButton">
+			<a href="/helfer/new">registrieren</a>
+		</div> -->
+	</table>
+	{% endif %}
+{% endblock %}

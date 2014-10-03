@@ -1,0 +1,91 @@
+{% extends 'base.xml' %}
+
+{% block headline %}
+Helferanmeldung
+{% endblock %}
+
+
+{% block content %}
+	<div class="textbox">
+		<h3>Danke, dass du uns helfen möchtest!</h3>
+
+		Du bekommst das Helfer-Shirt in dunkelgrün mit KIF-41,5-Logo von uns.
+		Außerdem gibt es für jeden Helfer die KIF-Tasche mit Konferenzmaterial
+		und einem Alu-Becher.
+		<p/>Wenn du besonders fleißig bist und 7 oder
+		mehr Schichten machst, legen wir noch einen Kapuzenzipper oben drauf.
+		<p/>
+		Falls du zusätzlich ein schwarzes Teilnehmershirt möchtest, kannst du es für 5 Euro kaufen.
+		<p/>
+		Die Daten, die du hier angibst, werden selbstverständlich nach der KIF von uns gelöscht.
+		Handynummer und Mailadresse hätten wir gerne, um mit dir kommunizieren zu können
+		(Handy eher für kurzfristige Dinge, Mail eher für Helfergrillen-Details).
+
+	</div>
+	<br/><br/>
+
+	<div class="textbox">
+	<!-- helfer eintragen -->
+	<form method="POST" action="/helfer/new" enctype="multipart/form-data">
+		<table>
+			<tr>
+				<td>Username (für Namensschild)</td>
+				<td><input type="text" name="username" width="80" data-dataType="stringNotEmpty"/></td>
+			</tr>
+			<tr>
+				<td>Passwort</td>
+				<td><input type="password" name="password" width="80" data-dataType="stringNotEmpty"/></td>
+			</tr>
+
+			<tr>
+				<td>Mailadresse</td>
+				<td><input type="text" name="email" width="80" data-dataType="customRegex" data-regExp="^((.+@.+\..+)|())$"/></td>
+			</tr>
+			<tr>
+				<td>Handynummer (nur Zahlen)</td>
+				<td><input type="text" name="mobile" width="25" data-dataType="customRegex" data-regExp="^[\d]*$" /></td>
+			</tr>
+
+			<tr>
+				<td>T-Shirt-<a href="https://kif.fsi.informatik.uni-erlangen.de/static/images/sizechart_tshirt.jpg">Größe</a> (unisex)</td>
+				<td>
+					<select name="shirt_size">
+						<option value="S">S</option>
+						<option value="M">M</option>
+						<option value="L">L</option>
+						<option value="XL">XL</option>
+						<option value="XXL">XXL</option>
+					</select>
+				</td>
+			</tr>
+
+			<tr>
+				<td>zusätzliches Teilnehmershirt (5&euro;)</td>
+				<td>
+					<input type="checkbox" name="want_participant_shirt" />
+				</td>
+			</tr>
+
+			<tr>
+				<td>Kapuzenzipper-<a href="https://kif.fsi.informatik.uni-erlangen.de/static/images/sizechart_zipper.jpg">Größe</a></td>
+				<td>
+					<select name="pullover_size">
+						<option value="S">S</option>
+						<option value="M">M</option>
+						<option value="L">L</option>
+						<option value="XL">XL</option>
+					</select>
+				</td>
+			</tr>
+
+			<tr>
+				<td>Bemerkungen,<br/>sachdienliche Hinweise etc.</td>
+				<td><textarea name="comment" cols="35" rows="5"/></td>
+			</tr>
+			<tr>
+				<td colspan="2"><input type="submit" value=" registrieren  " /></td>
+			</tr>
+		</table>
+	</form>
+	</div>
+{% endblock %}

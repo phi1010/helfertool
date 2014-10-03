@@ -1,0 +1,75 @@
+{% extends 'base.xml' %}
+{% block content %}
+	<h1>Schicht anlegen</h1>
+	<!-- schicht eintragen -->
+	<form method="POST" action="/schicht/new" enctype="multipart/form-data">
+		<table>
+			<tr>
+				<td>Name</td>
+				<td><input type="text" name="name" width="80"/></td>
+			</tr>
+
+			<tr>
+				<td>Station</td>
+				<td>
+					<select name="station_id">
+						{% for station in stations %}
+						<option value="{{station['id']}}">{{station['name']}}</option>
+						{% endfor %}
+					</select>
+				</td>
+			</tr>
+			
+			<tr>
+				<td>Datum</td>
+				<td>
+					Von:
+					<select name="from_day">
+						<option value="0">Dienstag</option>
+						<option value="1" selected="selected">Mittwoch</option>
+						<option value="2">Donnerstag</option>
+						<option value="3">Freitag</option>
+						<option value="4">Samstag</option>
+						<option value="5">Sonntag</option>
+						<option value="6">Montag</option>
+					</select>
+					<select name="from_hour">
+						{% for hour in range(0, 24) %}
+						<option value="{{hour}}">{{hour}} Uhr</option>
+						{%endfor%}
+					</select><br/>
+					Bis:
+					<select name="until_day">
+						<option value="0">Dienstag</option>
+						<option value="1" selected="selected">Mittwoch</option>
+						<option value="2">Donnerstag</option>
+						<option value="3">Freitag</option>
+						<option value="4">Samstag</option>
+						<option value="5">Sonntag</option>
+						<option value="6">Montag</option>
+					</select>
+					<select name="until_hour">
+						{% for hour in range(1, 25) %}
+						<option value="{{hour}}">{{hour}} Uhr</option>
+						{%endfor%}
+					</select>
+				</td>
+			</tr>
+
+			<tr>
+				<td>besonderheiten dieser einen schicht<br/><small>(zusätzlich zur stationsbeschreibung)</small></td>
+				<td><textarea name="desc" /></td>
+			</tr>
+
+			<tr>
+				<td>benötigte helfer</td>
+				<td><input type="text" name="needed_persons" width="80" data-dataType="int"/></td>
+			</tr>
+
+			<tr>
+				<td colspan="2"><input type="submit" value=" Übernehmen " /></td>
+			</tr>
+		</table>
+	</form>
+
+{% endblock %}

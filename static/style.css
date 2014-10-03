@@ -1,0 +1,288 @@
+
+.nobullet {
+	list-style: none;
+}
+
+.headline, h1 {
+	font-size:3em;
+	font-family: serif;
+	font-weight:normal;
+	margin-top:0px;
+	margin-left:  20%;
+	margin-right: auto;
+}
+
+div#main {
+	margin-top:30px;
+	padding:0 5%;
+}
+
+.indent {
+	margin-left:30px;
+}
+
+.topBarContainer {
+	text-align:center;
+}
+
+.wrongInput {
+	#border:1px solid red;
+	background-color:#FFDDDD;
+}
+
+/* error and notification section */
+.viewBlocker {
+	background-color:white;
+	opacity:0.75;
+	position:absolute;
+	top:0;
+	left:0;
+	height:100%;
+	width:100%;
+	z-index:9998;
+}
+
+.notificationHeader, .errorHeader{
+	font-size:2em;
+	line-height:1.4em;
+}
+
+.messages {
+	position:absolute;
+	top:25%;
+	left:25%;
+	width:50%;
+	text-align:center;
+	z-index:9999;
+}
+
+.errorMessage {
+	border:2px solid darkred;
+	background-color:#FFDDDD;
+	min-height:60px;
+	margin-bottom:15px;
+	padding:20px;
+}
+
+.notificationMessage {
+	border:2px solid #AAAA99;
+	background-color:#FFFFEE;
+	min-height:60px;
+	margin-bottom:15px;	
+	padding:20px;
+}
+
+/*navigation section*/
+.topBar {
+	border-bottom:2px solid maroon;
+	height:120px;
+	margin:0 auto;
+	display:inline-block;
+	font-size: 0.8em;
+	color: maroon;
+	line-height:100%;
+	font-family:Verdana;
+}
+
+.topBox { 
+	height:100%;
+	text-align:left;
+	float:left;
+}
+
+.navigationBox {
+	display:inline-block;
+	width:170px;
+	margin-left:20px;X
+}
+
+.section {
+	color: white;
+	background-color: maroon;
+	
+	display:block;
+	padding:0.3em;
+	width:120px;
+	
+	text-decoration: none;
+	font-weight: bold;	
+	
+	border: 1px solid black;
+	border-color: #fefefe black black #fefefe;
+}
+
+.navLink {
+	display:block;
+	margin-left:30px;
+	margin-top:5px;
+	padding:0.3em;
+	width:120px;
+	
+	text-decoration: none;
+	font-weight: bold;
+	
+	border: 1px solid black;
+	border-color: #fefefe black black #fefefe;
+	
+	color: maroon;
+	background-color: #eee;
+}
+
+.loginbox {
+	margin-left:50px;
+	display: inline-block;
+	height:100%;
+	font-size: small;
+}
+
+#loginInfo{
+	text-indent:-2.3ex;
+	margin-left:2.3ex;
+}
+
+.loginbox .textButton{
+	text-align:right;
+}
+
+.navigationBox .navLink:hover{
+	border-color: black #fefefe #fefefe black;
+}
+
+.navigationBox .section {
+}
+
+
+/*schichtplan section*/
+
+.schichtPlanContainer{
+	padding-right:20px;
+	display:inline-block;
+}
+
+.schichtPlanTab.singleuser {
+	float:left;
+}
+
+#tabs{
+	display:inline-block !important;
+}
+
+.horizontalDivider {
+	background-color:lightgray;
+	border:0px !important;
+	height:10px;
+	font-size:0px;
+}
+
+.divider {
+	background-color:lightgray;
+	border:0px !important;
+	width:20px;
+	max-width:20px;
+}
+
+.smallDivider {
+	width:5px;
+}
+
+.schichtplan {
+	border:1px solid black;
+}
+
+.schichtplan .frei {
+	text-align:center;
+}
+
+.schichtplan th {
+	text-align:center;
+	font-size: 15pt;
+}
+
+.schichtplan tr {
+	height:2em;
+}
+
+.schichtplan td {
+	border-top:1px dotted gray;
+	margin:0px;
+}
+
+.schichtplan td.schicht {
+	border-style:solid;
+	border-width:0px 2px 0px 2px;
+	text-align:center;
+	vertical-align:top;
+	max-width:200px;
+	min-width:120px;
+	padding:2px;
+	margin-top:30px;
+}
+
+.schichtplan td.schicht a {
+	color:#222222;
+}
+
+.schichtplan td.schicht.genuegendhelfer{
+	border-color:darkgreen;
+	background-color:#51DC82;
+}
+
+.schichtplan td.schicht.zuwenigehelfer {
+	border-color:#A3A721;
+	background-color:yellow;
+}
+
+.schichtplan td.schicht.schichtanfang {
+	border-top-width:2px;
+}
+
+.schichtplan td.schicht.schichtende {
+	border-bottom-width:2px;
+}
+
+.schichtplan td.schicht.vielzuwenigehelfer {
+	border-color:darkred;
+	background-color:#DC5151;
+}
+
+.schichtplan td.schicht.nutzerschoneingetragen {
+	border-color:#4682b4;
+	background-color:#00bffF !important;
+}
+
+.schichtplan .hour{
+	padding-left: 10px;
+	padding-right:30px;
+}
+
+.schichtplan .description{
+	font-size:0.75em;
+}
+
+/*faq section*/
+.questionanswerscontainer {
+	margin-bottom:20px;
+	border-left:2px solid gray;
+	padding-left:0.3em;
+}
+
+.questiontitle {
+	font-weight:bold;
+	font-size:1.1em;
+}
+
+.questioncontainer {
+	margin-bottom:30px;
+}
+
+.answercontainer {	
+	text-indent:-80px;
+	margin-left:80px;
+}
+
+.textbox {
+	padding-top:  20px;
+	margin-left:  auto;
+	margin-right: auto;
+	width:        70%;
+}

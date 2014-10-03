@@ -1,0 +1,42 @@
+{% extends 'base.xml' %}
+
+{% block headline %}
+Willkommen
+{% endblock %}
+
+{% block content %}
+
+<div class="textbox">
+Willkommen auf der Helfer-Organisations- und Informations-Seite für die KIF 41,5
+in Erlangen (<a href="https://kif.fsinf.de/wiki/Hauptseite">mehr Infos zur Veranstaltung auf der offiziellen Seite</a>)..
+</div>
+
+<div class="textbox">
+	Du bist höchstwahrscheinlich hier gelandet, weil du Informatik, CE,
+	MedTech, Mathe, Physik oder an der FAU studierst. Am besten wir
+	erklären kurz, wie wir uns das alles so ungefähr vorstellen, und was
+	hoffentlich wie laufen wird.
+</div>
+
+<div class="textbox">
+	<h3>Anmeldung</h3>
+	Die Helfer-Anmeldung ist geschlossen. Danke an unsere Helfer!
+	<!--
+	Damit wir alle einen Überblick bekommen, wer wo helfen möchte und wo
+	es noch fehlt, gibt es diese Website. Nach der <a
+		href="/helfer/new">Anmeldung</a> kannst du dir Helferschichten
+	aussuchen.  Falls dir irgendwas unklar ist, stelle uns eine <a
+		href="/questions">Frage</a>! -->
+</div>
+
+<div class="textbox">
+	<h3>Was springt dabei für mich raus?</h3>
+	Du bist bei der KIF dabei und darfst außerhalb deiner Schichten am kompletten
+	Programm teilnehmen (zum Beispiel: Arbeitskreise zu gesellschaftlichen und
+	unipolitischen Themen, Sport, Cocktailabend und das 24 Stunden am Tag 
+	verfügbare "ewige Frühstück").
+	Außerdem wirst du zum Helfereinweisungs-Grillen eingeladen und erhälst diverse
+	Goodies <!-- (siehe <a href="/helfer/new">Anmeldungsseite</a>) -->.
+</div>
+
+{% endblock %}

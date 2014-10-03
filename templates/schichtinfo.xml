@@ -1,0 +1,30 @@
+{% extends 'base.xml' %}
+
+{% block content %}
+<h1>Schichtinfo für die Schicht #{{schicht_id}}</h1>
+<table>
+	<tr>
+		<td>Name</td>
+		<td>{{schicht['name']}}</td>
+	</tr>
+	<tr>
+		<td>Beschreibung</td>
+		<td>{{schicht['description']}}</td>
+	</tr>
+	<tr>
+		<td>Anzahl Personen</td>
+		<td>benötigt: {{schicht['needed_persons']}}, bereits rekrutiert: {{schicht['have_persons']}}</td>
+	</tr>
+	<tr>
+		<td>Station</td>
+		<td>{{schicht.stationname}}</td>
+	</tr>
+	{% if belegt == 0 and schicht['needed_persons'] < schicht['have_persons'] %}<form action="/schicht/claim" method="POST">
+		<input name="schicht_id" type="hidden" value="{{schicht['id']}}" />
+		<input name="station_id" type="hidden" value="{{schicht['station_id']}}" />
+		<tr>
+			<td><input type="submit" value="claim" /></td>
+		</tr>
+	</form>{% endif %}
+</table>
+{% endblock %}

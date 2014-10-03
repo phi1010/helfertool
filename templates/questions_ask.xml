@@ -1,0 +1,22 @@
+{% extends 'base.xml' %}
+
+{% block content %}
+	<!-- frage eintragen -->
+	<h1>Frage stellen</h1>
+	<form method="POST" action="/questions/ask" enctype="multipart/form-data">
+		<table>
+			<tr>
+				<td>Titel</td>
+				<td><input type="text" name="title" width="80" data-dataType="stringNotEmpty"/></td>
+			</tr>
+			<tr>
+				<td>Frage</td>
+				<td><textarea name="text" cols="42" rows="5" data-dataType="stringNotEmpty"/></td>
+			</tr>
+			<tr>
+				<td colspan="2"><input type="submit" value=" Frage stellen " /></td>
+			</tr>
+		</table>
+	</form>
+
+{% endblock %}

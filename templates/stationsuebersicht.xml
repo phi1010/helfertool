@@ -1,0 +1,14 @@
+{% extends 'base.xml' %}
+
+{% block content %}
+<h1>Stationenübersicht</h1>
+<table>
+{% for station in stationen %}
+	<tr>
+		<td><h3>{{station['name']}}</h3></td>
+		<td>{{station['description']}}</td>
+	</tr>
+{% endfor %}
+</table>
+
+{% endblock %}

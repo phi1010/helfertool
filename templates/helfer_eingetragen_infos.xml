@@ -1,0 +1,26 @@
+{% extends 'base.xml' %}
+
+{% block headline %}
+Welcome aboard
+{% endblock %}
+
+{% block content %}
+
+<div class="textbox">
+Vielen Dank <b>{{username}}</b>! Du hast dich erfolgreich als Helfer für die KIF
+41,5 registriert.
+</div>
+
+<div class="textbox">
+	<h3>So, und was als nächstes?</h3>
+	Du kannst dir jetzt im <a href="/schicht">Schichtplan</a> Schichten
+	aussuchen. Alternativ erstmal <a href="/questions">Fragen</a> lesen oder eine
+	eigene stellen.
+	<p/>
+	Außerdem kannst du uns immer per
+	<a href="">eMail</a> erreichen, und während
+	der KIF das Orgabüro unter der Handynummer 
+</div>
+
+{% endblock %}
+

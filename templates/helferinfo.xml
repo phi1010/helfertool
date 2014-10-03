@@ -1,0 +1,115 @@
+{% extends 'base.xml' %}
+
+{% block headline %}
+{{helfer['username']}}s Helferpage
+{% endblock %}
+
+{% block content %}
+
+<h3>Meine Schichten</h3>
+{% if schichten|count == 0 %}
+<li>noch keine :-/</li>
+{% else %}
+Du kannst dich bis maximal {{config.user_shift_unclaim_timeout_hours}} Stunden vor der Schicht austragen.
+<table cellspacing="5" cellpadding="10">
+	{% for schicht in schichten %}
+	<tr>
+		<td>
+			{{schicht['name']}}, am {{ config.day_name[schicht['from_day']] }} von
+			{{ schicht['from_hour'] }} bis
+			{% if schicht['from_day'] != schicht['until_day'] %}
+				{{ config.day_name[schicht['until_day']] }}
+			{% endif %}
+			{{ schicht['until_hour'] }} uhr.
+		</td>
+		<td>
+			{% if showButton[loop.index0] %}
+				<form action="/schicht/unclaim" method="POST">
+					<input type="hidden" name="schicht_id" value="{{schicht['id']}}" />
+					<input type="hidden" name="helfer_id" value="{{helfer['id']}}" />
+					<input type="submit" value="austragen" />
+				</form>
+			{%endif%}
+		</td>
+	</tr>
+	{% endfor %}
+	</table>
+Möchtest du einen <a href="/schichtplan/{{helfer['id']}}">Stundenplan</a>?
+
+Außerdem kannst du deine Schichten in deinen <a href="/helfer/{{helfer['id']}}.ics">Kalender</a> einbinden (ical-Format).
+{% endif %}
+
+<p/>
+
+{% if not helfer['signed_hygiene'] and not helfer['signed_fire'] %}
+	Du hast noch nicht unterschrieben, dass du Brandschutz- und Hygiene-Bestimmungen gelesen hast. Bitte hole das zeitnah nach.
+{% else %}
+	{% if not helfer['signed_hygiene'] %}
+		Du hast noch nicht unterschrieben, dass du die Hygiene-Bestimmungen gelesen hast. Bitte hole das zeitnah nach.
+	{% else %}
+		{% if not helfer['signed_fire'] %}
+		Du hast noch nicht unterschrieben, dass du die Brandschutz-Bestimmungen gelesen hast. Bitte hole das zeitnah nach.
+		{% endif %}
+	{% endif %}
+{% endif %}
+
+<h3>Passwort ändern</h3>
+
+<form action="/helfer/changepw" method="POST">
+<table>
+	<tr>
+		<td>Altes Passwort</td>
+		<td><input type="password" name="old_pw" data-dataType="stringNotEmpty"/></td>
+	</tr>
+	<tr>
+		<td>Neues Passwort</td>
+		<td><input type="password" name="new_first" data-dataType="stringNotEmpty"/></td>
+	</tr>
+	<tr>
+		<td>Neues Passwort nochmal</td>
+		<td><input type="password" name="new_second" data-dataType="stringNotEmpty"/></td>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<input type="submit" value="ändern"/>
+		</td>
+	</tr>
+</table>
+</form>
+
+<h3>Meine Daten</h3>
+<form action="/helfer/change_data" method="POST">
+<table>
+	<tr>
+		<th>Mailadresse</th>
+		<th>Handynummer</th>
+		<th>Zusätzliches Teilnehmershirt (5&euro;)</th>
+	</tr>
+	<tr>
+		<td>
+			<input type="text" name="email" value="{{helfer['email']}}" />
+		</td>
+		<td>
+			<input type="text" name="mobile" value="{{helfer['mobile']}}" />
+		</td>
+{% if config.shirt_stuff_changeable %}
+		<td>
+			<input type="checkbox" name="want_participant_shirt" {% if helfer['shirt'] %}checked="True"{% endif %}/>
+		</td>
+{% else %}
+		<td>
+			Die Shirt-Umentscheidungs-Deadline ist vorbei. Du hast dich {% if want_participant_shirt %} für {% else %} gegen {% endif %} ein zusätzliches Teilnehmershirt entschieden.
+		</td>
+{% endif %}
+	</tr>
+	<tr>
+		<td />
+		<td />
+		<td>
+			<input type="submit" value="ändern" />
+		</td>
+	</tr>
+</table>
+</form>
+
+{% endblock %}

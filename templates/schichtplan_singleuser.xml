@@ -1,0 +1,80 @@
+	{% extends 'base.xml' %}
+
+
+	{% block content %}
+	<h1>Schichtplan für {{username}}</h1>
+
+	<script type="text/javascript">
+	$(function() {
+		$('#username').autocomplete({source: {{ all_users.keys() }} });
+	});
+	</script>
+	
+	 <script>
+		$(function() {
+		$( document ).tooltip();
+		});
+	</script>
+	<div id="tabs">
+	{% for tagNr, tag in tage.iteritems() %}
+		<div class="schichtPlanTab singleuser" id="tabs-{{tagNr}}">
+		<div class="schichtPlanContainer">
+			<h2>{{config.day_name[tagNr]}}</h2>
+			<table class="schichtplan" cellpadding="0" cellspacing="0">
+				<tr>
+					<th>Zeit</th><td class="divider">&nbsp;</td>
+					{% for station in station_sorted if station[0] in tag.stationen %}<th colspan="{{tag.stationen[station[0]]|length*2-1}}">{{station[1]}}</th><th class="divider">&nbsp;</th>{%endfor%}
+				</tr>
+				<tr class="horizontalDivider">
+					<td class="horizontalDivider">&nbsp;</td><td class="horizontalDivider">&nbsp;</td>
+					{% for station in station_sorted if station[0] in tag.stationen %}<td colspan="{{tag.stationen[station[0]]|length*2}}" class="horizontalDivider">&nbsp;</td>{%endfor%}
+				</tr>
+				{% for hour in range(0, 24) %}
+				{% set timeslot = tag["schichten"][hour] %}
+				<tr>
+					{#<!--<td>{{ "%02d" | format((quarter/4) | round(0,'floor') | int) }}:{{ "%02d" | format((quarter%4*15) | round(0,'floor') | int) }}</td>-->#}
+					<td id="hour_{{tagNr}}_{{'%02d' | format(hour)}}" class="hour">{{"%02d" | format(hour)}}&nbsp;-&nbsp;{{"%02d" | format(hour+1)}}&nbsp;Uhr</td><td class="divider">&nbsp;</td>
+					{% for station in station_sorted if station[0] in timeslot%}
+						{% set aufgaben = timeslot[station[0]]%}
+						{% for aufgabe, schicht in aufgaben.iteritems() %}
+						
+							{% if schicht == None %}
+								<td class="frei" id="frei_{{tagNr}}_{{'%02d' | format(hour)}}">--</td>
+							{% else %}
+								{%set class = "schicht" %}
+								{%set rowspan = 1 %}
+						
+								{%if schicht.from_day == schicht.until_day %}
+									{%set class = class ~ " schichtende"%}
+								{%endif%}
+						
+								{%if (hour==0 and not schicht.from_day == schicht.until_day) or (hour > 0 and tag["schichten"][hour-1][station[0]][aufgabe]==None)%}
+									{%set class = class ~ " schichtanfang"%}
+								{%endif%}
+						
+								{%if schicht.from_day == schicht.until_day %}
+									{%set rowspan = schicht.until_hour - schicht.from_hour %}
+								{%else%}
+									{%set rowspan = 24-schicht.from_hour %}
+								{%endif%}
+						
+								{% if hour == 0
+									or tag["schichten"][hour-1][station[0]][aufgabe]==None
+									or not tag["schichten"][hour-1][station[0]][aufgabe].id == schicht.id %}
+								<td rowspan="{{rowspan}}" class="{{class}}" id="schicht_{{schicht.stationname}}_{{tagNr}}_{{'%02d' | format(hour)}}"   title="{%if schicht.description %}{{schicht.description}}{%else%}Keine Beschreibung vorhanden!{%endif%}">
+									<a href="/schicht/{{schicht.id}}"><b>{{schicht.name}}</b></a><br/>
+									<span class="description">{{schicht.description | truncate(80)}}</span>
+								</td>
+								{%endif%}
+							{% endif %}{%if not loop.last%}<td class="smallDivider">&nbsp;</td>{%endif%}
+						{%endfor%}<td class="divider">&nbsp;</td>
+					{%endfor%}
+				</tr>
+				{%endfor%}
+			</table>
+		</div>
+		</div>
+	{%endfor%}
+	</div>
+
+	{% endblock %}

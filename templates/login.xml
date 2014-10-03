@@ -1,0 +1,12 @@
+{% extends 'base.xml' %}
+{% block content %}
+
+
+<h1>login</h1>
+	{% if message is defined %}
+		{{message}}
+	{% endif %}
+
+	{% include "loginbox.xml" %}
+
+{% endblock %}

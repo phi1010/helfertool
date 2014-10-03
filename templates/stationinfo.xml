@@ -1,0 +1,16 @@
+{% extends 'base.xml' %}
+
+{% block content %}
+<h1>Stationsinformation für #{{station_id}}</h1>
+
+<table>
+	<tr>
+		<td>Name</td>
+		<td>{{station_name}}</td>
+	</tr>
+	<tr>
+		<td>Beschreibung</td>
+		<td>{{station_desc}}</td>
+	</tr>
+</table>
+{% endblock %}

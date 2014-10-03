@@ -1,0 +1,7 @@
+{"unreadMessages": {{unreadMessageCount}},
+	"messages": [
+{% for message in messages %}
+		{ "title": "{{message.title|e}}" }{% if loop.last != true %}, {%endif%}
+{%endfor%}
+	]
+}
