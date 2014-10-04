@@ -58,7 +58,7 @@
 
 			<tr>
 				<td>besonderheiten dieser einen schicht<br/><small>(zusätzlich zur stationsbeschreibung)</small></td>
-				<td><textarea name="desc" /></td>
+				<td><textarea name="desc" ></textarea></td>
 			</tr>
 
 			<tr>

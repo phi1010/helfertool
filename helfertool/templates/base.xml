@@ -1,0 +1,132 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de" lang="de">
+	<head>
+		<title>{%if is_user_admin(session) %}{{helfertool_config.pagetitle}}{%endif%}</title>
+		{% block css %}
+		<link type="text/css" href="{{ url_for('static', filename='style.css') }}" rel="stylesheet" />
+		<link type="text/css" href="{{ url_for('static', filename='jquery-ui-1.10.3.custom.min.css') }}" rel="stylesheet" />
+		<style type="text/css">
+			.adminOnly{
+				{% if not is_user_admin(session) %}
+					visibility:hidden
+				{%endif%}
+			}
+
+			.loggedInOnly,.loggedInOnly:hover{
+				{% if not is_user_logged_in(session) %}
+					color:darkgray;
+					border-width:0 0 0 0;
+					cursor:default;
+				{%endif%}
+			}
+
+			.loggedInHide{
+				{% if is_user_logged_in(session) %}
+					visibility:hidden
+				{%endif%}
+			}
+		</style>
+		{% endblock %}
+		{% block js %}
+		<script type="text/javascript" src="{{ url_for('static', filename='jquery-1.10.2.min.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='jquery-ui-1.10.3.custom.min.js') }}"></script>
+		<script type="text/javascript" src="{{ url_for('static', filename='local.js') }}"></script>
+
+
+		{% if not is_user_logged_in(session) %}
+			<script type="text/javascript">$(document).ready(function(){$(".loggedInOnly").attr("href", "#");})</script>
+		{% endif %}
+
+		{% endblock %}
+		{% block javascript %}{% endblock %}
+		{% block meta %}
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		{% endblock %}
+	</head>
+	<body>
+
+
+		<div class="topBarContainer">
+			<div class="topBar">
+				<div class="navbar topBox">
+					<div class="navigationBox">
+						<a href="/" class="navLink">Start</a>
+						<a href="/redirect/my_page" class="navLink loggedInOnly">Meine Seite</a>
+						<a href="/admin" class="navLink adminOnly">Admin-Menü</a>
+					</div>
+					<div class="navigationBox">
+						<span class="section">Helfer</span>
+							<a href="/helfer" class="navLink loggedInOnly">Übersicht</a>
+							<a href="/helfer/new" class="navLink loggedInHide">registrieren</a>
+					</div>
+					<div class="navigationBox">
+						<span class="section">Schichten</span>
+							<a href="/schicht" class="navLink">Übersicht</a>
+							<a href="/schicht/new" class="navLink adminOnly">anlegen</a>
+					</div>
+					<div class="navigationBox">
+						<span class="section">Stationen</span>
+							<a href="/station" class="navLink">Übersicht</a>
+							<a href="/station/new" class="navLink adminOnly">anlegen</a>
+					</div>
+					<div class="navigationBox">
+						<span class="section">Fragen</span>
+							<a href="/questions" class="navLink">Übersicht</a>
+							<a href="/questions/ask" class="navLink loggedInOnly">Frage stellen</a>
+					</div>
+					<!-- <div class="navigationBox">
+						<span class="section" id="navbar-nachrichten">Nachrichten <span style="display:none;font-weight:bold">(<span id="messageCount"></span> neue)</span></span>
+							<a href="/messages/show" class="navLink">Übersicht</a>
+							<span class="navLink" style="visibility:hidden">&nbsp;</span>
+					</div> -->
+				</div>
+				<div style="text-align: center;" class="loginbox topBox">
+					{% include "loginbox.xml" %}
+					{% if is_user_logged_in(session) and session.days > 0 %}
+						<p/>&nbsp;
+						<p/>
+						<span style="font-weight: bolder;">
+							nur noch {{session.days}} Tag{% if session.days > 1 %}e{% endif %}!
+						</span>
+					{% endif %}
+				</div>
+				<br style="clear:both;" />
+			</div>
+		</div>
+
+		{%if session.messages%}
+		<div class="viewBlocker" id="messageViewBlocker" onclick="removeFirstMessage();">&nbsp;</div>
+		<div class="messages">
+				{%for message in session.messages%}
+					{%if message.type == "error"%}
+						<div class="message errorMessage">
+							<span class="errorHeader">Fehler</span><br/>
+					{%else%}
+						<div class="message notificationMessage">
+							<span class="notificationHeader">Hinweis</span><br/>
+					{%endif%}
+				{{message.text}}<br/>
+				<button onclick="removeMessage(this);">OK</button>
+				</div>
+				{%endfor%}
+				{% if messages_displayed(session) %}{%endif%} {#do not display output of message_displayed#}
+		</div>
+		{%endif%}
+
+		<div id="main">
+			<div class="headline">
+			{% block headline %}
+			{% endblock %}
+			</div>
+			{% block content %}
+			{% endblock %}
+		</div>
+		<br />
+
+		<div id="footer">
+			{% block footer %}
+			{% endblock %}
+		</div>
+	</body>
+</html>
+

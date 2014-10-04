@@ -1,17 +1,10 @@
 #!/usr/bin/python
 
+import config
+import helfertool.db
 
-from werkzeug import script
-from werkzeug.debug import DebuggedApplication
+from helfertool import app
 
-import db
+app.secret_key=config.secret_key
 
-
-def make_app():
-	from web.application import Schicht
-	return DebuggedApplication(Schicht(), evalex=True)
-
-
-action_runserver = script.make_runserver(make_app, use_reloader=True)
-
-script.run()
+app.run(debug=True)

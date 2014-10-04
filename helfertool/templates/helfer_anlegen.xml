@@ -80,7 +80,7 @@ Helferanmeldung
 
 			<tr>
 				<td>Bemerkungen,<br/>sachdienliche Hinweise etc.</td>
-				<td><textarea name="comment" cols="35" rows="5"/></td>
+				<td><textarea name="comment" cols="35" rows="5"></textarea></td>
 			</tr>
 			<tr>
 				<td colspan="2"><input type="submit" value=" registrieren  " /></td>

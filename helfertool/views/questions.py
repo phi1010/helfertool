@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
 
-from web.utils import render_template, expose, url_for, run_command_output, invalid_form_error
-from web.login_utils import require_login
+from ..utils.utils import  run_command_output, invalid_form_error
+from ..utils.login_utils import require_login
 
-from werkzeug import redirect
-import web.utils
-import db
+from flask import redirect, request, render_template, session
+import helfertool.utils.utils as utils
+import helfertool.db as db
 import config
+
+from helfertool import app
 
 ## frage stellen
 @require_login
-@expose('/questions/ask')
-def questions_ask(request):
+@app.route('/questions/ask', methods=["GET", "POST"])
+def questions_ask():
 	if request.method == "GET":	
-		return render_template('questions_ask.xml', session=request.session)
+		return render_template('questions_ask.xml', session=session)
 	
 	title = request.form.get('title')
 	question = request.form.get('text')
@@ -21,24 +23,24 @@ def questions_ask(request):
 	
 	
 	if not db.sane_str((title,question), True):
-		return invalid_form_error(request.session,
+		return invalid_form_error(session,
 				msg=u"titel oder fragentext enthalten ungültige zeichen")
 
 	if not thread_id:
 		thread_id = db.insert('INSERT INTO question_threads (title) VALUES (?)', (title,))
 	else:
 		if not db.sane_int(thread_id):
-			return invalid_form_error(request.session,
+			return invalid_form_error(session,
 					msg=u"hast du versucht an der thread_id rumzuspielen?  das is auf jeden fall kein int..")
 	
 	db.insert('INSERT INTO question (title, text, asking_person, thread_id) VALUES (?, ?, ?, ?)',
-				(title, question, request.session["userid"], thread_id))
+				(title, question, session["userid"], thread_id))
 	
 	return redirect("/questions/{}".format(thread_id))
 
 @require_login
-@expose('/questions/answer/<int:questionid>')
-def questions_answer(request, questionid):
+@app.route('/questions/answer/<int:questionid>', methods=["GET", "POST"])
+def questions_answer(questionid):
 	if request.method == "GET":
 		return redirect("/questions")
 
@@ -51,7 +53,7 @@ def questions_answer(request, questionid):
 
 	answer = request.form.get('text')
 	if not db.sane_str(answer, True):
-		return invalid_form_error(request.session,
+		return invalid_form_error(session,
 				msg=u"antworttext leer oder enthält ungültige zeichen")
 
 	db.insert('INSERT INTO answer (question, text, thread_id) VALUES (?,?,?)',
@@ -61,8 +63,8 @@ def questions_answer(request, questionid):
 
 
 ## thread zu der einen frage
-@expose('/questions/<int:thread_id>')
-def question_thread(request, thread_id):
+@app.route('/questions/<int:thread_id>')
+def question_thread(thread_id):
 	matches = db.select("""SELECT
 				question_threads.title AS ttitle,
 				question.id AS qid,
@@ -82,11 +84,11 @@ def question_thread(request, thread_id):
 			ORDER BY
 			 	question.id ASC""", (thread_id,))
 
-	return render_template('questions_thread.xml', title=matches[0]["ttitle"], tid=thread_id, frage=matches, session=request.session)
+	return render_template('questions_thread.xml', title=matches[0]["ttitle"], tid=thread_id, frage=matches, session=session)
 
 ## gestellte fragen, alle
-@expose('/questions')
-def questions_overview(request):
+@app.route('/questions')
+def questions_overview():
 	matches = db.select("""SELECT
 				question_threads.id AS tid,
 				question_threads.title AS ttitle,
@@ -110,4 +112,4 @@ def questions_overview(request):
 				HAVING
 					checker = 0""")
 	
-	return render_template('questions.xml', questions=matches, unanswered=unanswered, session=request.session)
+	return render_template('questions.xml', questions=matches, unanswered=unanswered, session=session)

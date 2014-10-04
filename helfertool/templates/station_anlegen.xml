@@ -10,7 +10,7 @@
 			</tr>
 			<tr>
 				<td>Beschreibung</td>
-				<td><textarea name="beschreibung" cols="42" rows="5"/></td>
+				<td><textarea name="beschreibung" cols="42" rows="5"></textarea></td>
 			</tr>
 			<tr>
 				<td colspan="2"><input type="submit" value=" Übernehmen " /></td>

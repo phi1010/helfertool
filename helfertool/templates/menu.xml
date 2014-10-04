@@ -1,0 +1,65 @@
+<style type="text/css">
+	.adminOnly{
+		{% if not is_user_admin(session) %}
+			visiblity:hidden
+		{%endif%}
+	}
+
+	.loggedInOnly{
+		{% if not is_user_logged_in(session) %}
+			visiblity:hidden
+		{%endif%}
+	}
+
+	.loggedInHide{
+		{% if is_user_logged_in(session) %}
+			visiblity:hidden
+		{%endif%}
+	}
+<div class="topBarContainer">
+	<div class="topBar">
+		<div class="navbar topBox">
+			<div class="navigationBox">
+				<a href="/" class="navLink">Start</a>
+				<a href="/redirect/my_page" class="navLink loggedInOnly">Meine Seite</a>
+				<a href="/admin" class="navLink adminOnly">Admin-Menü</a>
+			</div>
+			<div class="navigationBox">
+				<span class="section">Helfer</span>
+					<a href="/helfer" class="navLink loggedInOnly">Übersicht</a>
+					<a href="/helfer/new" class="navLink loggedInHide">registrieren</a>
+			</div>
+			<div class="navigationBox">
+				<span class="section">Schichten</span>
+					<a href="/schicht" class="navLink">Übersicht</a>
+					<a href="/schicht/new" class="navLink adminOnly">anlegen</a>
+			</div>
+			<div class="navigationBox">
+				<span class="section">Stationen</span>
+					<a href="/station" class="navLink">Übersicht</a>
+					<a href="/station/new" class="navLink adminOnly">anlegen</a>
+			</div>
+			<div class="navigationBox">
+				<span class="section">Fragen</span>
+					<a href="/questions" class="navLink">Übersicht</a>
+					<a href="/questions/ask" class="navLink loggedInOnly">Frage stellen</a>
+			</div>
+			<!-- <div class="navigationBox">
+				<span class="section" id="navbar-nachrichten">Nachrichten <span style="display:none;font-weight:bold">(<span id="messageCount"></span> neue)</span></span>
+					<a href="/messages/show" class="navLink">Übersicht</a>
+					<span class="navLink" style="visibility:hidden">&nbsp;</span>
+			</div> -->
+		</div>
+		<div style="text-align: center;" class="loginbox topBox">
+			{% include "loginbox.xml" %}
+			{% if is_user_logged_in(session) and session.days > 0 %}
+				<p/>&nbsp;
+				<p/>
+				<span style="font-weight: bolder;">
+					nur noch {{session.days}} Tag{% if session.days > 1 %}e{% endif %}!
+				</span>
+			{% endif %}
+		</div>
+		<br style="clear:both;" />
+	</div>
+</div>

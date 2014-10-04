@@ -30,7 +30,7 @@
 				<div class="answerfieldcontainer">
 					Noch keine Antwort eingetragen. Frage beantworten?
 					<form method="POST" action="/questions/answer/{{f.qid}}">
-						<textarea name="text" cols="42" rows="5" data-dataType="stringNotEmpty"/>
+						<textarea name="text" cols="42" rows="5" data-dataType="stringNotEmpty"></textarea>
 						<button type="submit">Antwort eintragen</button>
 					</form>
 				</div><!--answerfieldcontainer inner-->

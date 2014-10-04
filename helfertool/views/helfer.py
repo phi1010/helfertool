@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 
-from web.utils import render_template, expose, url_for, run_command_output, invalid_form_error
-from web.session_utils import create_session, is_user_admin
-from web.login_utils import require_login, require_admin, check_login_credentials, _find_userid_byname, _find_username_byid
+from ..utils.utils import run_command_output, invalid_form_error
+from ..utils.session_utils import create_session, is_user_admin
+from ..utils.login_utils import require_login, require_admin, check_login_credentials, _find_userid_byname, _find_username_byid
 
-from werkzeug import redirect
+from flask import redirect, request, render_template, session
 from werkzeug.wrappers import Request, Response
 
-import web.utils
-import db
+import helfertool.utils.utils as utils
+import helfertool.db as db
 import config
+
+from helfertool import app
 
 from Crypto.Random import random
 from passlib.hash import sha256_crypt
@@ -20,14 +22,12 @@ from icalendar import Calendar, Event
 import pytz
 
 ## neuen helfer eintragen
-@expose('/helfer/new')
-def neuerhelfer(request):
-	if not is_user_admin(request.session):
-		return redirect('/')
+@app.route('/helfer/new', methods=["POST", "GET"])
+def neuerhelfer():
 	if request.method == 'GET':
 		## formular anzeigen, weil noch kein POST-foo
 		return render_template('helfer_anlegen.xml',
-				session=request.session)
+				session=session)
 
 	## we got a request, handle it
 	username = request.form.get('username')
@@ -43,33 +43,33 @@ def neuerhelfer(request):
 
 	## einzeln für spezifischere fehlermeldungen
 	if not db.sane_str(username, True):
-		return  invalid_form_error(request.session,
+		return  invalid_form_error(session,
 				msg=u"username leer oder enthält ungültige zeichen")
 
 	if not db.sane_str(password, True):
-		return  invalid_form_error(request.session,
+		return  invalid_form_error(session,
 				msg=u"passwort leer oder enthält ungültige zeichen")
 
 	if not db.sane_str(email):
-		return  invalid_form_error(request.session,
+		return  invalid_form_error(session,
 				msg=u"email enthält ungültige zeichen")
 	if not db.sane_str(mobile):
-		return  invalid_form_error(request.session,
+		return  invalid_form_error(session,
 				msg=u"handynummer enthält ungültige zeichen")
 	if not db.sane_str(comment):
-		return  invalid_form_error(request.session,
+		return  invalid_form_error(session,
 				msg=u"kommentartext enthält ungültige zeichen")
 	if not db.sane_str(tshirt):
-		return invalid_form_error(request.session,
+		return invalid_form_error(session,
 				msg=u"T-Shirt-Größe enthält ungültige Zeichen")
 	if not db.sane_str(pullover):
-		return invalid_form_error(request.session,
+		return invalid_form_error(session,
 				msg=u"Pullover-Größe enthält ungültige Zeichen")
 	
 
 	db_uid, found = _find_userid_byname(username)
 	if found:
-		return invalid_form_error(request.session,
+		return invalid_form_error(session,
 				msg=u'ein benutzer mit diesem name existiert bereits. ich fürchte du musst dir einen anderen namen ausdenken')
 
 	crypted = sha256_crypt.encrypt(password)
@@ -77,26 +77,26 @@ def neuerhelfer(request):
 	userid = db.insert("INSERT INTO person (username, password, email, mobile, comment, is_admin, tshirt_size, pullover_size, want_participant_shirt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", (username, crypted, email, mobile, comment, 0, tshirt, pullover, want_participant_shirt))
 
 	## man ist auch gleich eingeloggt, wenn man sich registriert hat
-	create_session(request.session, userid, username, False)
+	create_session(session, userid, username, False)
 
 	return render_template('helfer_eingetragen_infos.xml',
-			username=username, email = email, session=request.session)
+			username=username, email = email, session=session)
 
 ## der eine helfer -- was er macht, zur not delete-knopf
 @require_login
-@expose('/helfer/<int:helferid>')
-def helferinfo(request, helferid):
-	admin_mode = is_user_admin(request.session)
+@app.route('/helfer/<int:helferid>')
+def helferinfo(helferid):
+	admin_mode = is_user_admin(session)
 
-	if (request.session["userid"] != helferid) and not admin_mode:
+	if (session["userid"] != helferid) and not admin_mode:
 		return render_template('error.xml', error_short='unauthorized',
 			error_long="du kannst nur deine eigenen schichten anschauen. entweder du bist nicht eingeloggt, oder du versuchst schichten anderer leute anzuzeigen",
-			config=config, session=request.session)
+			config=config, session=session)
 
 	if admin_mode:
 		helfer_name, found = _find_username_byid(helferid)
 	else:
-		helfer_name=request.session['username']
+		helfer_name=session['username']
 
 	helfer = db.select('''SELECT
 		id,
@@ -114,7 +114,7 @@ def helferinfo(request, helferid):
 	if len(helfer) != 1:
 		return render_template('error.xml', error_short='invalid user',
 			error_long="irgendwas ist faul. du bist als benutzer #%d eingeloggt, aber nicht in der db." % (helferid,),
-			config=config, session=request.session)
+			config=config, session=session)
 
 	rows = db.select('''SELECT
 			schicht.id AS id,
@@ -145,12 +145,12 @@ def helferinfo(request, helferid):
 			schichten=rows,
 			helfer=helfer[0],
 			showButton=showButton,
-			session=request.session)
+			session=session)
 
 
 @require_login
-@expose('/helfer/changepw')
-def passwort_aendern(request):
+@app.route('/helfer/changepw', methods=["POST"])
+def passwort_aendern():
 	if request.method != 'POST':
 		return redirect('/helfer')
 
@@ -158,33 +158,33 @@ def passwort_aendern(request):
 	new_first = request.form.get('new_first')
 	new_second = request.form.get('new_second')
 
-	if not check_login_credentials(request.session['username'], old_pw):
+	if not check_login_credentials(session['username'], old_pw):
 		error_long = u"Das alte Passwort, das du eingegeben hast, stimmt nicht. Du kannst dein Passwort auch bei einem Admin ändern lassen, frag am besten per Mail bei %s" % config.admin_email
 		return render_template('error.xml', error_short=u"altes passwort falsch",
 				error_long=error_long,
-				session=request.session)
+				session=session)
 
 	if new_first != new_second:
 		error_long = u"Die beiden neuen Passwörter sind nicht gleich. Du hast dich sehr wahrscheinlich vertippt. Du kannst dein Passwort auch bei einem Admin ändern lassen, frag am besten per Mail bei %s" % config.admin_email
 		return render_template('error.xml',
 				error_short=u"Neue Passwörter sind unterschiedlich",
 				error_long=error_long,
-				session=request.session)
+				session=session)
 
 	crypted = sha256_crypt.encrypt(new_first)
 	db.update('UPDATE person SET password=? WHERE id=?', (crypted,
-		request.session['userid']))
+		session['userid']))
 
 	return redirect('/redirect/my_page')
 
 
 @require_login
-@expose('/helfer/change_data')
-def dinge_aendern(request):
+@app.route('/helfer/change_data', methods=["POST"])
+def dinge_aendern():
 	if request.method != 'POST':
 		return redirect('/helfer')
 
-	userid = request.session['userid']
+	userid = session['userid']
 	new_email = request.form.get('email')
 	new_mobile = request.form.get('mobile')
 	want_shirt = request.form.get('want_participant_shirt') == "on"
@@ -218,8 +218,8 @@ def dinge_aendern(request):
 
 
 @require_admin #we expose sensitive user information here!
-@expose('/helfer.csv')
-def alle_helfer_csv(request, helferid=None):
+@app.route('/helfer.csv')
+def alle_helfer_csv(helferid=None):
 	columns = "username, email, mobile, tshirt_size, pullover_size, want_participant_shirt, signed_hygiene, signed_fire, COUNT(person_schicht.pers_id) as shiftCount, min(schicht.from_day * 24 + schicht.from_hour) / 24 AS firstday, min(schicht.from_day * 24 + schicht.from_hour) % 24 AS firsthour "
 	
 	persons = db.select("SELECT {} FROM person LEFT OUTER JOIN person_schicht ON person_schicht.pers_id = person.id LEFT OUTER JOIN schicht ON schicht.id = person_schicht.schicht_id GROUP BY person.id ORDER BY LOWER(username)".format(columns))
@@ -232,8 +232,8 @@ def alle_helfer_csv(request, helferid=None):
 	response.headers['content-type'] = 'text/csv; charset=utf-8'
 	return response
 
-@expose('/helfer/<int:helferid>.ics')
-def helfer_ical(request,helferid):
+@app.route('/helfer/<int:helferid>.ics')
+def helfer_ical(helferid):
 	rows = db.select('''SELECT
 			schicht.id AS id,
 			schicht.name AS name,
@@ -296,8 +296,8 @@ def helfer_ical(request,helferid):
 	return response
 
 ## übersicht ueber alle
-@expose('/helfer')
-def helfer_overview(request):
+@app.route('/helfer')
+def helfer_overview():
 	helfer = db.select('SELECT id, username FROM person')
 
 	schichten = {}
@@ -310,6 +310,6 @@ def helfer_overview(request):
 			person_schicht.pers_id=?''', (h[0],))
 
 	return render_template('helferuebersicht.xml', schichten=schichten,
-			session=request.session)
+			session=session)
 
 

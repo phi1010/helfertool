@@ -6,13 +6,14 @@ import datetime
 
 
 admin_email = "foo@example.com"
+secret_key = "cryptographicallystrongsecretgoeshere"
 
 ## das was im html <title> angezeigt wird
 pagetitle = 'Helferorganisation KIF 41,5'
 
 # Make sure all the following paths exist! (They do if you don't change
 # the defaults)
-basedir = dirname(__file__)
+basedir = dirname(__file__)+"/helfertool"
 templates = join(basedir, "templates")
 staticdir = join(basedir, "static")
 sessionstoredir = join(basedir, "sessions")

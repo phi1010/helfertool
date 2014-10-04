@@ -11,7 +11,7 @@
 			</tr>
 			<tr>
 				<td>Frage</td>
-				<td><textarea name="text" cols="42" rows="5" data-dataType="stringNotEmpty"/></td>
+				<td><textarea name="text" cols="42" rows="5" data-dataType="stringNotEmpty"></textarea></td>
 			</tr>
 			<tr>
 				<td colspan="2"><input type="submit" value=" Frage stellen " /></td>

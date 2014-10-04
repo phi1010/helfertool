@@ -19,7 +19,7 @@
 	{% for tagNr, tag in tage.iteritems() %}
 		<div class="schichtPlanTab singleuser" id="tabs-{{tagNr}}">
 		<div class="schichtPlanContainer">
-			<h2>{{config.day_name[tagNr]}}</h2>
+			<h2>{{helfertool_config.day_name[tagNr]}}</h2>
 			<table class="schichtplan" cellpadding="0" cellspacing="0">
 				<tr>
 					<th>Zeit</th><td class="divider">&nbsp;</td>

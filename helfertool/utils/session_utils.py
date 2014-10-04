@@ -3,7 +3,7 @@
 
 from datetime import datetime, timedelta, date
 
-import db
+import helfertool.db as db
 import config
 import hashlib
 
@@ -30,7 +30,7 @@ def is_user_admin(session):
 	return is_user_logged_in(session) and session['is_admin']
 
 def is_user_logged_in(session):
-	return 'userid' in session
+	return 'userid' in session and not session['userid'] == None
 
 def validate_session(session):
 	if not 'userid' in session or not 'auth_token' in session or not 'username' in session or not 'is_admin' in session or \

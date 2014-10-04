@@ -10,15 +10,15 @@
 {% if schichten|count == 0 %}
 <li>noch keine :-/</li>
 {% else %}
-Du kannst dich bis maximal {{config.user_shift_unclaim_timeout_hours}} Stunden vor der Schicht austragen.
+Du kannst dich bis maximal {{helfertool_config.user_shift_unclaim_timeout_hours}} Stunden vor der Schicht austragen.
 <table cellspacing="5" cellpadding="10">
 	{% for schicht in schichten %}
 	<tr>
 		<td>
-			{{schicht['name']}}, am {{ config.day_name[schicht['from_day']] }} von
+			{{schicht['name']}}, am {{ helfertool_config.day_name[schicht['from_day']] }} von
 			{{ schicht['from_hour'] }} bis
 			{% if schicht['from_day'] != schicht['until_day'] %}
-				{{ config.day_name[schicht['until_day']] }}
+				{{ helfertool_config.day_name[schicht['until_day']] }}
 			{% endif %}
 			{{ schicht['until_hour'] }} uhr.
 		</td>
@@ -92,7 +92,7 @@ Außerdem kannst du deine Schichten in deinen <a href="/helfer/{{helfer['id']}}.
 		<td>
 			<input type="text" name="mobile" value="{{helfer['mobile']}}" />
 		</td>
-{% if config.shirt_stuff_changeable %}
+{% if helfertool_config.shirt_stuff_changeable %}
 		<td>
 			<input type="checkbox" name="want_participant_shirt" {% if helfer['shirt'] %}checked="True"{% endif %}/>
 		</td>

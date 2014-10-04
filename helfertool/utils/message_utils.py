@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import datetime
-import db
+import helfertool.db as db
 
 def _getUserIdFromName(name):
 	userid = db.select("""SELECT id

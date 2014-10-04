@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from web.utils import render_template, expose, url_for
-from web.session_utils import is_user_logged_in, is_user_admin
-import db
+from session_utils import is_user_logged_in, is_user_admin
+import helfertool.db as db
+
+from flask import render_template, session
 
 from passlib.hash import sha256_crypt
 
@@ -46,12 +47,12 @@ def require_login(function):
 	def decorator2(*args, **name):
 		request = args[0]
 
-		if is_user_logged_in(request.session):
+		if is_user_logged_in(session):
 			return function(*args, **name) 
 		else:
 			return render_template("login.xml",
 					message = "Bitte log dich ein, um diese Funktion zu nutzen.",
-					redirect_target = request.url, session=request.session)
+					redirect_target = request.url, session=session)
 
 	return decorator2
 
@@ -67,12 +68,12 @@ def require_admin(func):
 	def require_admin_decorator(*args, **name):
 		request = args[0]
 
-		if not is_user_admin(request.session):
+		if not is_user_admin(session):
 			return render_template('error.xml',
 					error_short='requires admin rights',
 					error_long='''the action you were trying to perform requires
 					admin priviliges, which you dont have''',
-					session=request.session)
+					session=session)
 
 		return func(*args, **name)
 

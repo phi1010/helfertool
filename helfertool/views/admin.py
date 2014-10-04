@@ -1,25 +1,27 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from web.utils import render_template, expose, url_for, run_command_output, invalid_form_error
-from web.session_utils import is_user_admin
-from web.login_utils import require_login, require_admin, _find_userid_byname
+from ..utils.utils import  run_command_output, invalid_form_error
+from ..utils.session_utils import is_user_admin
+from ..utils.login_utils import require_login, require_admin, _find_userid_byname
 
-from werkzeug import redirect
+from helfertool import app
+
+from flask import redirect, request, render_template,session
 
 from passlib.hash import sha256_crypt
 
-import db
+import helfertool.db as db
 
 @require_login
 @require_admin
-@expose('/admin/toggle')
-def toggle_admin_flag(request):
+@app.route('/admin/toggle', methods=["GET", "POST"])
+def toggle_admin_flag():
 	if request.method != 'POST':
 		return render_template('error.xml',
 				error_short='invalid request',
 				error_long='you didnt send a POST request. we don\'t understand anything else',
-				session=request.session)
+				session=session)
 	
 	userid = request.form.get('toggle_uid')
 	valid_uid = True
@@ -34,7 +36,7 @@ def toggle_admin_flag(request):
 		return render_template('error.xml',
 				error_short='invalid userid',
 				error_long='that is not a valid userid',
-				session=request.session)
+				session=session)
 
 	## probably ok by now
 	was_admin_before = rows[0]['is_admin']
@@ -46,13 +48,13 @@ def toggle_admin_flag(request):
 
 @require_login
 @require_admin
-@expose('/admin/claim_schicht')
-def admin_claim_schicht(request):
+@app.route('/admin/claim_schicht', methods=["POST"])
+def admin_claim_schicht():
 	if request.method != 'POST':
 		return render_template('error.xml',
 				error_short='invalid request',
 				error_long='you didnt send a POST request. we don\'t understand anything else',
-				session=request.session)
+				session=session)
 
 	## XXX is it ok to use username here? should be, because the login checker
 	## corrects it if anyone tried to fiddle with it
@@ -60,11 +62,11 @@ def admin_claim_schicht(request):
 	schicht_id = request.form.get('schicht_id')
 
 	if not db.sane_int(schicht_id) or not db.sane_str(username):
-		return invalid_form_error(request.session, msg=u"schicht_id keine zahl oder username kein string")
+		return invalid_form_error(session, msg=u"schicht_id keine zahl oder username kein string")
 
 	userid, found = _find_userid_byname(username)
 	if not found:
-		return invalid_form_error(request.session, msg=u"user existiert nicht.  sicher dass du dich angemeldet hast?")
+		return invalid_form_error(session, msg=u"user existiert nicht.  sicher dass du dich angemeldet hast?")
 
 	db.insert('INSERT INTO person_schicht (pers_id, schicht_id) VALUES (?, ?)', (userid, schicht_id))
 
@@ -78,13 +80,13 @@ def admin_claim_schicht(request):
 
 @require_login
 @require_admin
-@expose('/admin/changepw')
-def userpw_aendern(request):
+@app.route('/admin/changepw', methods=["POST"])
+def userpw_aendern():
 	if request.method != 'POST':
 		return render_template('error.xml',
 				error_short='invalid request',
 				error_long='you didnt send a POST request. we don\'t understand anything else',
-				session=request.session)
+				session=session)
 
 	userid = request.form.get('userid')
 	new_pass = request.form.get('new_pass')
@@ -96,13 +98,13 @@ def userpw_aendern(request):
 
 @require_login
 @require_admin
-@expose('/admin/has_signed')
-def userpw_signed(request):
+@app.route('/admin/has_signed', methods=["POST"])
+def userpw_signed():
 	if request.method != 'POST':
 		return render_template('error.xml',
 				error_short='invalid request',
 				error_long='you didnt send a POST request. we don\'t understand anything else',
-				session=request.session)
+				session=session)
 
 	userid = request.form.get('userid')
 	signed_hygiene = 1 if request.form.get('signed_hygiene') else 0
@@ -119,19 +121,19 @@ def userpw_signed(request):
 
 @require_login
 @require_admin
-@expose('/admin/user_unclaim_schicht')
-def user_unclaim_schicht(request):
+@app.route('/admin/user_unclaim_schicht')
+def user_unclaim_schicht():
 	if request.method != 'GET':
 		return render_template('error.xml',
 				error_short='invalid request',
 				error_long='you didnt send a GET request. we don\'t understand anything else',
-				session=request.session)
+				session=session)
 
 	if not 'userid' in request.args or not 'schichtid' in request.args or not 'tag' in request.args:
 		return render_template('error.xml',
 				error_short='invalid request',
 				error_long='you didnt send userid or schichtid parameters. we cannot work like this',
-				session=request.session)
+				session=session)
 
 	userid = request.args['userid']
 	schichtid = request.args['schichtid']
@@ -141,7 +143,7 @@ def user_unclaim_schicht(request):
 		return render_template('error.xml',
 				error_short='invalid request',
 				error_long='you didn\'t provide numeric arguments. we cannot work like that',
-				session=request.session)
+				session=session)
 	
 	userid = int(userid)
 	schichtid = int(schichtid)
@@ -156,8 +158,8 @@ def user_unclaim_schicht(request):
 
 @require_login
 @require_admin
-@expose('/admin')
-def admin_view(request):
+@app.route('/admin')
+def admin_view():
 	if request.method == 'GET':
 		users = db.select('SELECT * FROM person')
 
@@ -208,12 +210,12 @@ def admin_view(request):
 						person_schicht AS ps) AS have
 				FROM schicht AS s;''')
 
-		return render_template('admin.xml', session=request.session,
+		return render_template('admin.xml', session=session,
 				users=users, schichten=schichten, conflicts=conflicts, howmany=howmany[0])
 
 	else:
 		return render_template('error.xml',
 				error_short='invalid request',
 				error_long='you sent neither a POST nor a GET request. we don\'t understand anything else',
-				session=request.session)
+				session=session)
 

@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
-from web.utils import render_template, expose, url_for, run_command_output, invalid_form_error
-from web.login_utils import require_login, is_user_logged_in, require_admin, is_user_admin
+from ..utils.utils import run_command_output, invalid_form_error
+from ..utils.login_utils import require_login, is_user_logged_in, require_admin, is_user_admin
 
-from werkzeug import redirect
-import db
+from flask import redirect, request, render_template,session
+import helfertool.db as db
 import config
+
+from helfertool import app
 
 import itertools
 import datetime
@@ -15,14 +17,14 @@ from copy import deepcopy
 ## neue schicht anlegen
 @require_login
 @require_admin
-@expose('/schicht/new')
-def neue_schicht(request):
+@app.route('/schicht/new', methods=["GET", "POST"])
+def neue_schicht():
 	if request.method == 'GET':
 		## formular anzeigen, weil noch kein POST-foo
 		stations = db.select('SELECT id, name FROM station')
 
 		return render_template('schicht_anlegen.xml',
-				session=request.session, stations=stations)
+				session=session, stations=stations)
 
 	## else: neue schicht eintragen
 	name = request.form.get('name')
@@ -38,7 +40,7 @@ def neue_schicht(request):
 	## kann hier eh nur admin, der tut ja nix böses..
 	if not db.sane_str(name, True) or not db.sane_str(desc) \
 		or not db.sane_int((station_id, needed_persons, from_day, until_day, from_hour, until_hour)):
-		return invalid_form_error(request.session,
+		return invalid_form_error(session,
 				msg="name leer oder irgendwo ungültige zeichen")
 	station_id = int(station_id)
 	needed_persons = int(needed_persons)
@@ -48,7 +50,7 @@ def neue_schicht(request):
 	until_hour = int(until_hour)
 
 	if from_day > until_day or ( from_day==until_day and from_hour >= until_hour ):
-		return invalid_form_error(request.session)
+		return invalid_form_error(session)
 
 	ret = db.insert("""INSERT INTO
 				schicht (name, description, needed_persons, station_id, from_day, until_day, from_hour, until_hour)
@@ -67,16 +69,16 @@ def neue_schicht(request):
 
 ## sich für diese eine schicht vormerken lassen
 @require_login
-@expose('/schicht/claim')
-def claim_schicht(request):
+@app.route('/schicht/claim', methods=["POST"])
+def claim_schicht():
 	if request.method != 'POST':
 		return redirect('/schicht')
 
-	pers_id = request.session["userid"]
+	pers_id = session["userid"]
 	schicht_id = request.form.get('schicht_id')
 
 	if not db.sane_int(schicht_id):
-		return invalid_form_error(request.session)
+		return invalid_form_error(session)
 
 	db.insert('INSERT INTO person_schicht (pers_id, schicht_id) VALUES (?, ?)', (pers_id, schicht_id))
 
@@ -88,8 +90,8 @@ def claim_schicht(request):
 
 
 @require_login
-@expose('/schicht/unclaim')
-def schicht_dochned(request):
+@app.route('/schicht/unclaim')
+def schicht_dochned():
 	## fiddle out helferid
 	helferid = request.form.get('helfer_id')
 	schicht_id = request.form.get('schicht_id')
@@ -103,16 +105,16 @@ def schicht_dochned(request):
 		tag = request.args['tag']
 
 	if not db.sane_int((helferid, schicht_id, tag)):
-		return invalid_form_error(request.session, 'parameters not numeric')
+		return invalid_form_error(session, 'parameters not numeric')
 	helferid = int(helferid)
 	schicht_id = int(schicht_id)
 	tag = int(tag)
 
 	## check this is the user with that very id
-	if not request.session["userid"] or not helferid or request.session["userid"] != helferid:
+	if not session["userid"] or not helferid or session["userid"] != helferid:
 		return render_template('error.xml', error_short='unauthorized',
 			error_long="du kannst nur deine eigenen schichten anschauen oder aendern. entweder du bist nicht eingeloggt, oder du versuchst schichten anderer leute anzuzeigen oder zu veraendern",
-			config=config, session=request.session)
+			config=config, session=session)
 
 	res = db.select("SELECT from_day, from_hour FROM schicht WHERE id=?",
 			(schicht_id,))
@@ -120,7 +122,7 @@ def schicht_dochned(request):
 	if not len(res)==1:
 		return render_template('error.xml', error_short='meh',
 			error_long="diese schicht gibt es nicht!",
-			config=config, session=request.session)
+			config=config, session=session)
 	else:
 		res = res[0]
 		
@@ -130,7 +132,7 @@ def schicht_dochned(request):
 	if res["from_day"]*24 + res["from_hour"] < daysSinceStart*24 + curHours + config.user_shift_unclaim_timeout_hours + 1: # +1 wg angefangene Stunden abziehen
 		return render_template('error.xml', error_short=u'Zu spät.',
 			error_long=u"Du kannst dich leider nur bist {}h vor der Schicht austragen. Sprich mit einem Organisator.".format(config.user_shift_unclaim_timeout_hours),
-			config=config, session=request.session)
+			config=config, session=session)
 		
 	## delete the assignment
 	db.update('DELETE FROM person_schicht WHERE pers_id=? AND schicht_id=? ',
@@ -141,8 +143,8 @@ def schicht_dochned(request):
 
 
 ## dinge über diese eine schicht
-@expose('/schicht/<int:schicht_id>')
-def schichtinfo(request, schicht_id):
+@app.route('/schicht/<int:schicht_id>')
+def schichtinfo(schicht_id):
 	schichten = db.select("""SELECT
 					schicht.*,
 					station.name AS stationname,
@@ -160,7 +162,7 @@ def schichtinfo(request, schicht_id):
 				ORDER BY
 					from_day ASC, from_hour ASC""", (schicht_id,))
 	belegt = True
-	if (is_user_logged_in(request.session)):
+	if (is_user_logged_in(session)):
 		belegt = db.select("""SELECT
 					count(*) as belegt
 				FROM
@@ -177,16 +179,16 @@ def schichtinfo(request, schicht_id):
 				INNER JOIN
 					person_schicht AS ps ON ps.schicht_id = s1.id
 				WHERE
-					s.id = ? AND ps.pers_id = ?;""", (schicht_id,request.session['userid']))
+					s.id = ? AND ps.pers_id = ?;""", (schicht_id,session['userid']))
 		belegt = belegt[0][0]
 
 	return render_template('schichtinfo.xml', schicht_id=schicht_id, schicht=schichten[0],
-			belegt=belegt, session=request.session)
+			belegt=belegt, session=session)
 
 ## übersicht über alle
-@expose('/schicht')
-@expose('/schichtplan/<int:userid>')
-def schichtuebersicht(request, userid=None):
+@app.route('/schicht')
+@app.route('/schichtplan/<int:userid>')
+def schichtuebersicht(userid=None):
 	schichten = db.select("""SELECT
 					schicht.*,
 					schicht.name AS aufgabe,
@@ -262,7 +264,7 @@ def schichtuebersicht(request, userid=None):
 
 	station_sorted = db.select('SELECT s.id, s.name FROM station AS s ORDER BY s.sort ASC;');
 
-	if is_user_logged_in(request.session):
+	if is_user_logged_in(session):
 		user_schichten = db.select("""SELECT
 							res.id, ps.schicht_id
 						FROM
@@ -276,11 +278,11 @@ def schichtuebersicht(request, userid=None):
 							((res.from_day * 24 + res.from_hour >= s1.from_day * 24 + s1.from_hour) AND
 								(res.until_day * 24 + res.until_hour <= s1.until_day * 24 + s1.until_hour))
 						WHERE
-							ps.pers_id = ? AND ps.schicht_id = s1.id;""", (request.session["userid"],))
+							ps.pers_id = ? AND ps.schicht_id = s1.id;""", (session["userid"],))
 
 		blocked_schichten = [x[0] for x in user_schichten]
 		user_schichten = [x[1] for x in user_schichten]
-		admin_mode = is_user_admin(request.session)
+		admin_mode = is_user_admin(session)
 	else:
 		user_schichten=[]
 		blocked_schichten = []
@@ -309,13 +311,13 @@ def schichtuebersicht(request, userid=None):
 		else:
 			return render_template('error.xml', error_short='wrong id',
 				error_long="pfui, diese userid gibt es nicht!",
-				config=config, session=request.session)
+				config=config, session=session)
 		template = "schichtplan_singleuser.xml"
 
 	return render_template(template,
 			schichten=schichten,
 			tage = tage,
-			session=request.session,
+			session=session,
 			admin_mode=admin_mode,
 			all_users=all_users,
 			user_schichten = user_schichten,
